@@ -1,0 +1,11 @@
+{
+    "name": "karunai-illam/donation-api",
+    "description": "Donation API for St. Antony's Karunai Illam",
+    "type": "project",
+    "require": {
+        "php": ">=7.2.0",
+        "mongodb/mongodb": "^1.12",
+        "ext-mongodb": "*",
+        "ext-json": "*"
+    }
+}

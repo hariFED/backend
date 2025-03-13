@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: donation-api
+    env: php
+    buildCommand: composer install
+    startCommand: vendor/bin/heroku-php-apache2
+    envVars:
+      - key: MONGODB_URI
+        sync: false
