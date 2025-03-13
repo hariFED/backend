@@ -3,8 +3,11 @@
 
 // Enable CORS to allow frontend to communicate with backend
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Content-Type: application/json");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Credentials: true");
+
+
 
 // Include MongoDB PHP library via Composer's autoloader
 require_once 'vendor/autoload.php';
@@ -39,10 +42,8 @@ function saveDonation($data) {
     
     // Generate a reference number
     $date = new DateTime();
-    $refNumber = 'SAKI-' . $date->format('Ymd') . rand(10, 99);
     
     // Add reference number and timestamp to data
-    $data['reference'] = $refNumber;
     $data['created_at'] = new MongoDB\BSON\UTCDateTime();
     
     // Insert donation data into MongoDB
@@ -53,7 +54,7 @@ function saveDonation($data) {
             return [
                 'success' => true,
                 'message' => 'Donation submitted successfully',
-                'reference' => $refNumber
+               
             ];
         } else {
             return [
