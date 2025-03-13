@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     // Validate required fields
-    $requiredFields = ['firstName', 'lastName', 'email', 'phone', 'donationFor', 'amount'];
+    $requiredFields = ['firstName', 'lastName', 'email', 'phone','company','address','country','state','city', 'donationFor', 'amount','reference'];
     $missingFields = [];
     
     foreach ($requiredFields as $field) {
