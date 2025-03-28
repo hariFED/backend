@@ -19,7 +19,7 @@ require_once 'vendor/autoload.php';
 function connectToMongoDB() {
     try {
         // MongoDB connection string - modify as needed
-        $uri = "mongodb+srv://hariusertesting:elqG88mMIsTjr690@db-life.0yvlo.mongodb.net/";
+        $uri = "mongodb+srv://dbkarunai:76qIFZyTwJk5cbx6@donation.g5ps9.mongodb.net/?retryWrites=true&w=majority&appName=donation";
         $client = new MongoDB\Client($uri);
         
         // Select database and collection
@@ -73,6 +73,48 @@ function saveDonation($data) {
     }
 }
 
+// Get all donations from database
+function getAllDonations() {
+    $collection = connectToMongoDB();
+    
+    if (!$collection) {
+        return [
+            'success' => false,
+            'message' => 'Database connection failed'
+        ];
+    }
+    
+    try {
+        // Find all documents in the collection
+        $cursor = $collection->find([], [
+            'sort' => ['created_at' => -1] // Sort by creation date, newest first
+        ]);
+        
+        $donations = [];
+        foreach ($cursor as $document) {
+            // Convert MongoDB\BSON\UTCDateTime to readable format
+            if (isset($document['created_at']) && $document['created_at'] instanceof MongoDB\BSON\UTCDateTime) {
+                $document['created_at'] = $document['created_at']->toDateTime()->format('Y-m-d H:i:s');
+            }
+            
+            // Convert MongoDB ObjectId to string
+            $document['_id'] = (string) $document['_id'];
+            
+            $donations[] = $document;
+        }
+        
+        return [
+            'success' => true,
+            'data' => $donations
+        ];
+    } catch (Exception $e) {
+        return [
+            'success' => false,
+            'message' => 'Database error: ' . $e->getMessage()
+        ];
+    }
+}
+
 // Process only POST requests for donation submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get JSON data from request body
@@ -109,12 +151,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = saveDonation($data);
     echo json_encode($result);
 } 
-// GET method to verify API is working
+// GET method for API status or to retrieve all donations
 else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    echo json_encode([
-        'status' => 'online',
-        'message' => 'St. Antony\'s Karunai Illam Donation API'
-    ]);
+    // Check if the request is specifically for getting all donations
+    if (isset($_GET['action']) && $_GET['action'] === 'getAllDonations') {
+        $result = getAllDonations();
+        echo json_encode($result);
+    } else {
+        // Default API status response
+        echo json_encode([
+            'status' => 'online',
+            'message' => 'St. Antony\'s Karunai Illam Donation API'
+        ]);
+    }
 } 
 // Handle other methods
 else {
