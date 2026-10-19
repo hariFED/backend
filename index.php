@@ -18,8 +18,11 @@ require_once 'vendor/autoload.php';
 // Connect to MongoDB
 function connectToMongoDB() {
     try {
-        // MongoDB connection string - modify as needed
-        $uri = "mongodb+srv://dbkarunai:REDACTED@donation.g5ps9.mongodb.net/?retryWrites=true&w=majority&appName=donation";
+        // MongoDB connection string comes from the MONGODB_URI env var (set it in Render)
+        $uri = getenv('MONGODB_URI');
+        if (!$uri) {
+            throw new Exception('MONGODB_URI is not set');
+        }
         $client = new MongoDB\Client($uri);
         
         // Select database and collection
